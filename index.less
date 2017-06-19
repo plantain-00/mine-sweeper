@@ -2,3 +2,17 @@
   padding: 0;
   margin: 0;
 }
+
+@height: 30px;
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+
+  .item {
+    height: @height;
+    width: @height;
+    line-height: @height;
+    text-align: center;
+  }
+}

@@ -1,1 +1,1 @@
-export const indexTemplateHtml = `<div></div>`;
+export const indexTemplateHtml = `<div><div class="control"></div><div class="main" :style="mainStyle"><template v-for="cell in cells"><div class="item">{{cell.rowIndex}} {{cell.columnIndex}}</div></template></div></div>`;
