@@ -4,7 +4,7 @@
         <template v-for="(row, rowIndex) in cells">
             <template v-for="(cell, columnIndex) in row">
                 <template v-if="cell.visible">
-                    <div v-if="cell.value === null" class="item mine">{{cell.value}}</div>
+                    <div v-if="cell.value === null" class="item mine"></div>
                     <div v-else-if="cell.value === 0" class="item"></div>
                     <div v-else class="item">{{cell.value}}</div>
                 </template>

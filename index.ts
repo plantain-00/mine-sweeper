@@ -68,19 +68,32 @@ class App extends Vue {
     }
 
     probe(rowIndex: number, columnIndex: number) {
-        const cell = this.cells[rowIndex][columnIndex];
-        if (cell.value === null) {
-            // lose the game
-        } else {
-            cell.value = this.getMineCountAround(rowIndex - 1, columnIndex - 1)
-                + this.getMineCountAround(rowIndex - 1, columnIndex)
-                + this.getMineCountAround(rowIndex - 1, columnIndex + 1)
-                + this.getMineCountAround(rowIndex, columnIndex - 1)
-                + this.getMineCountAround(rowIndex, columnIndex + 1)
-                + this.getMineCountAround(rowIndex + 1, columnIndex - 1)
-                + this.getMineCountAround(rowIndex + 1, columnIndex)
-                + this.getMineCountAround(rowIndex + 1, columnIndex + 1);
-            cell.visible = true;
+        if (rowIndex >= 0 && rowIndex < this.rowCount
+            && columnIndex >= 0 && columnIndex <= this.columnCount) {
+            const cell = this.cells[rowIndex][columnIndex];
+            if (cell.value === null) {
+                this.fail();
+            } else if (!cell.visible) {
+                cell.value = this.getMineCountAround(rowIndex - 1, columnIndex - 1)
+                    + this.getMineCountAround(rowIndex - 1, columnIndex)
+                    + this.getMineCountAround(rowIndex - 1, columnIndex + 1)
+                    + this.getMineCountAround(rowIndex, columnIndex - 1)
+                    + this.getMineCountAround(rowIndex, columnIndex + 1)
+                    + this.getMineCountAround(rowIndex + 1, columnIndex - 1)
+                    + this.getMineCountAround(rowIndex + 1, columnIndex)
+                    + this.getMineCountAround(rowIndex + 1, columnIndex + 1);
+                cell.visible = true;
+                if (cell.value === 0) {
+                    this.probe(rowIndex - 1, columnIndex - 1);
+                    this.probe(rowIndex - 1, columnIndex);
+                    this.probe(rowIndex - 1, columnIndex + 1);
+                    this.probe(rowIndex, columnIndex - 1);
+                    this.probe(rowIndex, columnIndex + 1);
+                    this.probe(rowIndex + 1, columnIndex - 1);
+                    this.probe(rowIndex + 1, columnIndex);
+                    this.probe(rowIndex + 1, columnIndex + 1);
+                }
+            }
         }
     }
 
@@ -91,6 +104,16 @@ class App extends Vue {
         }
         e.preventDefault();
         return false;
+    }
+
+    fail() {
+        for (const row of this.cells) {
+            for (const cell of row) {
+                if (cell.value === null) {
+                    cell.visible = true;
+                }
+            }
+        }
     }
 }
 
