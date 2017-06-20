@@ -4,15 +4,33 @@
 }
 
 @height: 30px;
+@border: 1px solid black;
 
 .main {
   display: flex;
   flex-wrap: wrap;
+  border-right: @border;
+  border-bottom: @border;
+  box-sizing: content-box;
 
   .item {
     height: @height;
     width: @height;
     line-height: @height;
     text-align: center;
+    border-left: @border;
+    border-top: @border;
+    box-sizing: border-box;
+  }
+
+  .unknown {
+    cursor: pointer;
+    background-color: gray;
+    color: white;
+  }
+
+  .mine {
+    background-color: black;
+    border-radius: @height / 2;
   }
 }

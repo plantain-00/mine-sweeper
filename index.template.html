@@ -1,8 +1,18 @@
 <div>
     <div class="control"></div>
     <div class="main" :style="mainStyle">
-        <template v-for="cell in cells">
-            <div class="item">{{cell.rowIndex}} {{cell.columnIndex}}</div>
+        <template v-for="(row, rowIndex) in cells">
+            <template v-for="(cell, columnIndex) in row">
+                <template v-if="cell.visible">
+                    <div v-if="cell.value === null" class="item mine">{{cell.value}}</div>
+                    <div v-else-if="cell.value === 0" class="item"></div>
+                    <div v-else class="item">{{cell.value}}</div>
+                </template>
+                <template v-else>
+                    <div v-if="cell.flagged" class="item unknown" @contextmenu="flag($event, rowIndex, columnIndex)">F</div>
+                    <div v-else class="item unknown" @click="probe(rowIndex, columnIndex)" @contextmenu="flag($event, rowIndex, columnIndex)"></div>
+                </template>
+            </template>
         </template>
     </div>
 </div>
