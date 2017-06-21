@@ -1,5 +1,17 @@
 <div>
-    <div class="control"></div>
+    <div class="control">
+        <span title="mines">{{remainMineCount}}</span>
+        <span title="unknown">{{remainUnknownCount}}</span>
+        <input type="number" v-model="rowCount" title="row count">
+        <input type="number" v-model="columnCount" title="column count">
+        <input type="number" v-model="mineCount" title="mine count">
+        <select v-model="difficulty" title="difficulty">
+            <option value="0">normal</option>
+            <option value="1">easy</option>
+            <!--<option value="2">easier</option>-->
+        </select>
+        <button @click="start()">restart</button>
+    </div>
     <div class="main" :style="mainStyle">
         <template v-for="(row, rowIndex) in cells">
             <template v-for="(cell, columnIndex) in row">
@@ -9,8 +21,8 @@
                     <div v-else class="item">{{cell.value}}</div>
                 </template>
                 <template v-else>
-                    <div v-if="cell.flagged" class="item unknown" @contextmenu="flag($event, rowIndex, columnIndex)">F</div>
-                    <div v-else class="item unknown" @click="probe(rowIndex, columnIndex)" @contextmenu="flag($event, rowIndex, columnIndex)"></div>
+                    <div v-if="cell.flagged" class="item unknown" @contextmenu="contextmenu($event, rowIndex, columnIndex, false)">F</div>
+                    <div v-else class="item unknown" @click="click(rowIndex, columnIndex)" @contextmenu="contextmenu($event, rowIndex, columnIndex, true)"></div>
                 </template>
             </template>
         </template>
