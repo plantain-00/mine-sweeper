@@ -8,7 +8,7 @@
         <select v-model="difficulty" title="difficulty">
             <option value="0">normal</option>
             <option value="1">easy</option>
-            <!--<option value="2">easier</option>-->
+            <option value="2">easier</option>
         </select>
         <button @click="start()">restart</button>
     </div>
@@ -21,7 +21,7 @@
                     <div v-else class="item">{{cell.value}}</div>
                 </template>
                 <template v-else>
-                    <div v-if="cell.flagged" class="item unknown" @contextmenu="contextmenu($event, rowIndex, columnIndex, false)">F</div>
+                    <div v-if="cell.flagged" class="item unknown" @contextmenu="contextmenu($event, rowIndex, columnIndex, false)">&para;</div>
                     <div v-else class="item unknown" @click="click(rowIndex, columnIndex)" @contextmenu="contextmenu($event, rowIndex, columnIndex, true)"></div>
                 </template>
             </template>

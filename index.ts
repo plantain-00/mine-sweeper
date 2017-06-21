@@ -11,6 +11,7 @@ type Cell = {
 const enum Difficulty {
     normal = 0,
     easy = 1,
+    easier = 2,
 }
 
 @Component({
@@ -42,8 +43,13 @@ class App extends Vue {
         this.start();
 
         setInterval(() => {
-            if (this.remainUnknownCount > 0 && this.difficulty >= Difficulty.easy) {
-                this.checkForEasy();
+            if (this.remainUnknownCount > 0) {
+                if (this.difficulty >= Difficulty.easy) {
+                    this.checkForEasy();
+                }
+                if (this.difficulty >= Difficulty.easier) {
+                    this.checkForEasier();
+                }
             }
         }, 1000);
     }
@@ -79,23 +85,6 @@ class App extends Vue {
         this.failed = false;
     }
 
-    getMineCountAround(rowIndex: number, columnIndex: number) {
-        return this.cells[rowIndex][columnIndex].value === null ? 1 : 0;
-    }
-
-    getFlaggedCountAround(rowIndex: number, columnIndex: number) {
-        return (!this.cells[rowIndex][columnIndex].visible && this.cells[rowIndex][columnIndex].flagged) ? 1 : 0;
-    }
-
-    getUnknownCountAround(rowIndex: number, columnIndex: number) {
-        return (!this.cells[rowIndex][columnIndex].visible && !this.cells[rowIndex][columnIndex].flagged) ? 1 : 0;
-    }
-
-    isValidIndex(rowIndex: number, columnIndex: number) {
-        return rowIndex >= 0 && rowIndex < this.rowCount
-            && columnIndex >= 0 && columnIndex < this.columnCount;
-    }
-
     click(rowIndex: number, columnIndex: number) {
         this.probe(rowIndex, columnIndex);
     }
@@ -106,7 +95,7 @@ class App extends Vue {
             if (cell.value === null) {
                 this.fail();
             } else {
-                cell.value = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.getMineCountAround(newRowIndex, newColumnIndex));
+                cell.value = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.cells[newRowIndex][newColumnIndex].value === null ? 1 : 0);
                 cell.visible = true;
                 this.remainUnknownCount--;
 
@@ -167,8 +156,20 @@ class App extends Vue {
         }
     }
 
+    getAroundPositions(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => Position | null): Position[] {
+        const positions: Position[] = [];
+        const results = this.around(rowIndex, columnIndex, action);
+        for (const result of results) {
+            if (result !== null) {
+                positions.push(result);
+            }
+        }
+        return positions;
+    }
+
     *aroundIndex<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
-        if (this.isValidIndex(rowIndex, columnIndex)) {
+        if (rowIndex >= 0 && rowIndex < this.rowCount
+            && columnIndex >= 0 && columnIndex < this.columnCount) {
             yield action(rowIndex, columnIndex);
         }
     }
@@ -196,11 +197,12 @@ class App extends Vue {
                 const cell = this.cells[rowIndex][columnIndex];
                 if (cell.visible) { // only check its value if it is visible, or it is cheat
                     if (cell.value !== null && cell.value !== 0) {
-                        const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.getFlaggedCountAround(newRowIndex, newColumnIndex));
-                        const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.getUnknownCountAround(newRowIndex, newColumnIndex));
-                        if (flaggedCount + unknownCount === cell.value) {
+                        const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0);
+                        const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0);
+                        const mineCount = cell.value - flaggedCount;
+                        if (mineCount === unknownCount) {
                             this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.flag(newRowIndex, newColumnIndex, true));
-                        } else if (flaggedCount === cell.value) {
+                        } else if (mineCount === 0) {
                             this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.probe(newRowIndex, newColumnIndex));
                         }
                     }
@@ -209,10 +211,59 @@ class App extends Vue {
         }
     }
 
-    // checkForEasier() {
+    checkForEasier() {
+        const conditions: Condition[] = [];
+        for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
+                const cell = this.cells[rowIndex][columnIndex];
+                if (cell.visible) { // only check its value if it is visible, or it is cheat
+                    if (cell.value !== null && cell.value !== 0) {
+                        const flaggedPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null);
+                        const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null);
+                        const mineCount = cell.value - flaggedPositions.length;
+                        if (mineCount > 0 && unknownPositions.length > 0) {
+                            conditions.push({
+                                positions: unknownPositions,
+                                mineCount,
+                            });
+                        }
+                    }
+                }
+            }
+        }
 
-    // }
+        for (const condition1 of conditions) {
+            for (const condition2 of conditions) {
+                if (condition1.positions.length > condition2.positions.length
+                    && condition2.positions.every(p2 => condition1.positions.some(p1 => p1.rowIndex === p2.rowIndex && p1.columnIndex === p2.columnIndex))) {
+                    const mineCount = condition1.mineCount - condition2.mineCount;
+                    const unknownCount = condition1.positions.length - condition2.positions.length;
+                    if (mineCount === unknownCount) {
+                        const positions = condition1.positions.filter(p1 => condition2.positions.every(p2 => p1.rowIndex !== p2.rowIndex || p1.columnIndex !== p2.columnIndex));
+                        for (const position of positions) {
+                            this.flag(position.rowIndex, position.columnIndex, true);
+                        }
+                    } else if (mineCount === 0) {
+                        const positions = condition1.positions.filter(p1 => condition2.positions.every(p2 => p1.rowIndex !== p2.rowIndex || p1.columnIndex !== p2.columnIndex));
+                        for (const position of positions) {
+                            this.probe(position.rowIndex, position.columnIndex);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
+type Position = {
+    rowIndex: number;
+    columnIndex: number;
+};
+
+type Condition = {
+    positions: Position[];
+    mineCount: number;
+};
 
 // tslint:disable-next-line:no-unused-expression
 new App({ el: "#container" });
