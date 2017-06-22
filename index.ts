@@ -6,12 +6,14 @@ type Cell = {
     value: number | null; // how many mines around, is mine if is null
     visible: boolean;
     flagged: boolean;
+    possibility: number;
 };
 
 const enum Difficulty {
     normal = 0,
     easy = 1,
     easier = 2,
+    noBrain = 3,
 }
 
 @Component({
@@ -43,12 +45,15 @@ class App extends Vue {
         this.start();
 
         setInterval(() => {
-            if (this.remainUnknownCount > 0) {
+            if (this.remainUnknownCount > 0 && !this.failed) {
                 if (this.difficulty >= Difficulty.easy) {
                     this.checkForEasy();
                 }
                 if (this.difficulty >= Difficulty.easier) {
                     this.checkForEasier();
+                }
+                if (this.difficulty >= Difficulty.noBrain) {
+                    this.checkForNoBrain();
                 }
             }
         }, 1000);
@@ -63,6 +68,7 @@ class App extends Vue {
                     value: 0,
                     visible: false,
                     flagged: false,
+                    possibility: 0,
                 });
             }
         }
@@ -247,6 +253,36 @@ class App extends Vue {
                         const positions = condition1.positions.filter(p1 => condition2.positions.every(p2 => p1.rowIndex !== p2.rowIndex || p1.columnIndex !== p2.columnIndex));
                         for (const position of positions) {
                             this.probe(position.rowIndex, position.columnIndex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    checkForNoBrain() {
+        for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
+                const cell = this.cells[rowIndex][columnIndex];
+                if (!cell.visible && !cell.flagged) {
+                    cell.possibility = 0;
+                }
+            }
+        }
+
+        for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
+                const cell = this.cells[rowIndex][columnIndex];
+                if (cell.visible) { // only check its value if it is visible, or it is cheat
+                    if (cell.value !== null && cell.value !== 0) {
+                        const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0);
+                        const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0);
+                        const mineCount = cell.value - flaggedCount;
+
+                        const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null);
+                        for (const position of unknownPositions) {
+                            const unknownCell = this.cells[position.rowIndex][position.columnIndex];
+                            unknownCell.possibility = Math.max(unknownCell.possibility, Math.round(mineCount * 100.0 / unknownCount));
                         }
                     }
                 }

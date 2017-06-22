@@ -4,3 +4,9 @@
 
 # mine-sweeper
 A mine sweeper game.
+
+#### todo
+
++ if A, B, C have 3 mines, then any 2 of them have 1 or 2 mines
++ if part of unknown positions have the same mine count as total mine count, then the rest unknown postions are all not mines
++ assume a unknown position is mine, then infer something that is conflict with facts, then the position is not mine

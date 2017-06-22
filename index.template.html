@@ -9,6 +9,7 @@
             <option value="0">normal</option>
             <option value="1">easy</option>
             <option value="2">easier</option>
+            <option value="3">no brain</option>
         </select>
         <button @click="start()">restart</button>
     </div>
@@ -22,7 +23,7 @@
                 </template>
                 <template v-else>
                     <div v-if="cell.flagged" class="item unknown" @contextmenu="contextmenu($event, rowIndex, columnIndex, false)">&para;</div>
-                    <div v-else class="item unknown" @click="click(rowIndex, columnIndex)" @contextmenu="contextmenu($event, rowIndex, columnIndex, true)"></div>
+                    <div v-else class="item unknown" @click="click(rowIndex, columnIndex)" @contextmenu="contextmenu($event, rowIndex, columnIndex, true)">{{(difficulty >= 3 && cell.possibility) ? cell.possibility : ""}}</div>
                 </template>
             </template>
         </template>
