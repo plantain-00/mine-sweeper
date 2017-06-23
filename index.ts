@@ -41,6 +41,10 @@ class App extends Vue {
         return this.rowCount * this.columnCount;
     }
 
+    get averagePossibility() {
+        return Math.round(this.remainMineCount * 100.0 / this.remainUnknownCount);
+    }
+
     beforeMount() {
         this.start();
 
@@ -68,7 +72,7 @@ class App extends Vue {
                     value: 0,
                     visible: false,
                     flagged: false,
-                    possibility: 0,
+                    possibility: -1,
                 });
             }
         }
@@ -265,7 +269,7 @@ class App extends Vue {
             for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
                 const cell = this.cells[rowIndex][columnIndex];
                 if (!cell.visible && !cell.flagged) {
-                    cell.possibility = 0;
+                    cell.possibility = -1;
                 }
             }
         }
