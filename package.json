@@ -43,7 +43,7 @@
     "karma-jasmine": "1.1.0",
     "karma-webpack": "2.0.3",
     "less": "2.7.2",
-    "rev-static": "2.5.0",
+    "rev-static": "2.7.1",
     "rimraf": "2.6.1",
     "standard": "10.0.2",
     "stylelint": "7.12.0",
