@@ -2,10 +2,11 @@ const webpack = require('webpack')
 
 module.exports = {
   entry: {
-    index: './index'
+    index: './index',
+    vendor: './vendor'
   },
   output: {
-    filename: '[name].min.js'
+    filename: '[name].bundle.js'
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -21,6 +22,9 @@ module.exports = {
       output: {
         comments: false
       }
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['index', 'vendor']
     })
   ],
   resolve: {

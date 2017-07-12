@@ -1,4 +1,6 @@
 {
-  "indexMinJs": "92 kB",
-  "indexMinCss": "4.45 kB"
+  "indexBundleJs": "10.9 kB 3.37 kB",
+  "vendorBundleJs": "82.1 kB 29.8 kB",
+  "indexBundleCss": "4.45 kB 1.21 kB",
+  "indexHtml": "15.8 kB 4.78 kB"
 }
