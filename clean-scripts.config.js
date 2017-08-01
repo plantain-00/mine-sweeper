@@ -2,7 +2,7 @@ module.exports = {
   build: [
     `rimraf *.bundle-*.js *.bundle-*.css`,
     `rimraf dist`,
-    `tsc -p src`,
+    `tsc`,
     `file2variable-cli index.template.html -o variables.ts --html-minify`,
     `tsc`,
     `lessc index.less > index.css`,
