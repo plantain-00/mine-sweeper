@@ -7,7 +7,8 @@
     "build": "clean-scripts build",
     "lint": "clean-scripts lint",
     "test": "clean-scripts test",
-    "fix": "clean-scripts fix"
+    "fix": "clean-scripts fix",
+    "watch": "clean-scripts watch"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,7 @@
   "devDependencies": {
     "@types/jasmine": "2.5.53",
     "clean-css-cli": "4.1.6",
-    "clean-scripts": "1.1.1",
+    "clean-scripts": "1.2.1",
     "file2variable-cli": "1.4.1",
     "github-fork-ribbon-css": "0.2.1",
     "jasmine": "2.7.0",
@@ -32,6 +33,7 @@
     "karma-jasmine": "1.1.0",
     "karma-webpack": "2.0.4",
     "less": "2.7.2",
+    "no-unused-export": "1.0.1",
     "rev-static": "3.2.2",
     "rimraf": "2.6.1",
     "standard": "10.0.2",
@@ -43,6 +45,7 @@
     "typescript": "2.4.2",
     "vue": "2.4.2",
     "vue-class-component": "5.0.2",
+    "watch-then-execute": "1.0.0",
     "webpack": "3.4.1"
   }
 }

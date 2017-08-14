@@ -18,17 +18,19 @@ module.exports = {
     `uglifyjs service-worker.js -o service-worker.bundle.js`
   ],
   lint: {
-    ts: `tslint "index.ts"`,
+    ts: `tslint "*.ts"`,
     js: `standard "**/*.config.js"`,
-    less: `stylelint "index.less"`
+    less: `stylelint "index.less"`,
+    export: `no-unused-export "*.ts"`
   },
   test: [
     'tsc -p spec',
     'karma start spec/karma.config.js'
   ],
   fix: {
-    ts: `tslint --fix "index.ts"`,
+    ts: `tslint --fix "*.ts"`,
     js: `standard --fix "**/*.config.js"`,
     less: `stylelint --fix "index.less"`
-  }
+  },
+  watch: `watch-then-execute "*.ts" "*.less" "*.template.html" --exclude "variables.ts" --script "npm run build"`
 }
