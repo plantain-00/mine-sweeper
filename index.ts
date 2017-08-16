@@ -27,8 +27,8 @@ class App extends Vue {
     cells: Cell[][] = [];
     remainMineCount = 0;
     remainUnknownCount = 0;
-    failed = false;
     difficulty = Difficulty.normal;
+    private failed = false;
 
     get mainStyle() {
         return {
@@ -37,7 +37,7 @@ class App extends Vue {
         };
     }
 
-    get cellsCount() {
+    private get cellsCount() {
         return this.rowCount * this.columnCount;
     }
 
@@ -99,21 +99,6 @@ class App extends Vue {
         this.probe(rowIndex, columnIndex);
     }
 
-    probe(rowIndex: number, columnIndex: number) {
-        const cell = this.cells[rowIndex][columnIndex];
-        if (!cell.visible && !cell.flagged) {
-            if (cell.value === null) {
-                this.fail();
-            } else {
-                cell.value = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.cells[newRowIndex][newColumnIndex].value === null ? 1 : 0);
-                cell.visible = true;
-                this.remainUnknownCount--;
-
-                this.checkForNormal(cell, rowIndex, columnIndex);
-            }
-        }
-    }
-
     contextmenu(e: Event, rowIndex: number, columnIndex: number, flagged: boolean) {
         this.flag(rowIndex, columnIndex, flagged);
         e.preventDefault();
@@ -139,7 +124,22 @@ class App extends Vue {
         }
     }
 
-    fail() {
+    private probe(rowIndex: number, columnIndex: number) {
+        const cell = this.cells[rowIndex][columnIndex];
+        if (!cell.visible && !cell.flagged) {
+            if (cell.value === null) {
+                this.fail();
+            } else {
+                cell.value = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.cells[newRowIndex][newColumnIndex].value === null ? 1 : 0);
+                cell.visible = true;
+                this.remainUnknownCount--;
+
+                this.checkForNormal(cell, rowIndex, columnIndex);
+            }
+        }
+    }
+
+    private fail() {
         this.failed = true;
         for (const row of this.cells) {
             for (const cell of row) {
@@ -150,7 +150,7 @@ class App extends Vue {
         }
     }
 
-    getAroundCount(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => number): number {
+    private getAroundCount(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => number): number {
         let count = 0;
         const results = this.around(rowIndex, columnIndex, action);
         for (const result of results) {
@@ -159,14 +159,14 @@ class App extends Vue {
         return count;
     }
 
-    aroundAction(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => void): void {
+    private aroundAction(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => void): void {
         const results = this.around(rowIndex, columnIndex, action);
         while (!results.next().done) {
             // do nothing
         }
     }
 
-    getAroundPositions(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => Position | null): Position[] {
+    private getAroundPositions(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => Position | null): Position[] {
         const positions: Position[] = [];
         const results = this.around(rowIndex, columnIndex, action);
         for (const result of results) {
@@ -177,14 +177,14 @@ class App extends Vue {
         return positions;
     }
 
-    *aroundIndex<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
+    private *aroundIndex<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
         if (rowIndex >= 0 && rowIndex < this.rowCount
             && columnIndex >= 0 && columnIndex < this.columnCount) {
             yield action(rowIndex, columnIndex);
         }
     }
 
-    *around<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
+    private *around<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
         yield* this.aroundIndex(rowIndex - 1, columnIndex - 1, action);
         yield* this.aroundIndex(rowIndex - 1, columnIndex, action);
         yield* this.aroundIndex(rowIndex - 1, columnIndex + 1, action);
@@ -195,13 +195,13 @@ class App extends Vue {
         yield* this.aroundIndex(rowIndex + 1, columnIndex + 1, action);
     }
 
-    checkForNormal(cell: Cell, rowIndex: number, columnIndex: number) {
+    private checkForNormal(cell: Cell, rowIndex: number, columnIndex: number) {
         if (cell.value === 0) {
             this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.probe(newRowIndex, newColumnIndex));
         }
     }
 
-    checkForEasy() {
+    private checkForEasy() {
         for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
                 const cell = this.cells[rowIndex][columnIndex];
@@ -221,7 +221,7 @@ class App extends Vue {
         }
     }
 
-    checkForEasier() {
+    private checkForEasier() {
         const conditions: Condition[] = [];
         for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
@@ -264,7 +264,7 @@ class App extends Vue {
         }
     }
 
-    checkForNoBrain() {
+    private checkForNoBrain() {
         for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
                 const cell = this.cells[rowIndex][columnIndex];
@@ -305,7 +305,6 @@ type Condition = {
     mineCount: number;
 };
 
-// tslint:disable-next-line:no-unused-expression
 new App({ el: "#container" });
 
 if (navigator.serviceWorker) {
