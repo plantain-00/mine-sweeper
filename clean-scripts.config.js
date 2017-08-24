@@ -6,7 +6,7 @@ module.exports = {
       js: [
         `file2variable-cli index.template.html -o variables.ts --html-minify`,
         `tsc`,
-        `webpack --display-modules --config webpack.config.js`
+        `webpack --display-modules`
       ],
       css: [
         `lessc index.less > index.css`,
@@ -14,7 +14,7 @@ module.exports = {
       ],
       clean: `rimraf *.bundle-*.js *.bundle-*.css`
     },
-    `rev-static --config rev-static.config.js`,
+    `rev-static`,
     [
       `sw-precache --config sw-precache.config.js --verbose`,
       `uglifyjs service-worker.js -o service-worker.bundle.js`
@@ -24,7 +24,7 @@ module.exports = {
     ts: `tslint "*.ts"`,
     js: `standard "**/*.config.js"`,
     less: `stylelint "index.less"`,
-    export: `no-unused-export "*.ts"`
+    export: `no-unused-export "*.ts" "index.less"`
   },
   test: [
     'tsc -p spec',
@@ -55,5 +55,17 @@ module.exports = {
     less: `watch-then-execute "index.less" --script "clean-scripts build[0].css"`,
     rev: `rev-static --watch`,
     sw: `watch-then-execute "vendor.bundle-*.js" "index.html" "worker.bundle.js" --script "clean-scripts build[2]"`
-  }
+  },
+  prerender: [
+    async () => {
+      const { createServer } = require('http-server')
+      const { prerender } = require('prerender-js')
+      const server = createServer()
+      server.listen(8000)
+      await prerender('http://localhost:8000', '#prerender-container', 'prerender.html')
+      server.close()
+    },
+    `clean-scripts build[1]`,
+    `clean-scripts build[2]`
+  ]
 }
