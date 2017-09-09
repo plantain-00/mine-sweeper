@@ -23,8 +23,8 @@
   "homepage": "https://github.com/plantain-00/mine-sweeper#readme",
   "devDependencies": {
     "@types/jasmine": "2.5.54",
-    "clean-css-cli": "4.1.6",
-    "clean-scripts": "1.2.4",
+    "clean-css-cli": "4.1.9",
+    "clean-scripts": "1.2.6",
     "file2variable-cli": "1.5.2",
     "github-fork-ribbon-css": "0.2.1",
     "http-server": "0.10.0",
@@ -41,7 +41,7 @@
     "rev-static": "3.4.0",
     "rimraf": "2.6.1",
     "standard": "10.0.3",
-    "stylelint": "8.0.0",
+    "stylelint": "8.1.1",
     "stylelint-config-standard": "17.0.0",
     "sw-precache": "5.2.0",
     "tslib": "1.7.1",
@@ -51,6 +51,6 @@
     "vue": "2.4.2",
     "vue-class-component": "5.0.2",
     "watch-then-execute": "1.0.1",
-    "webpack": "3.5.5"
+    "webpack": "3.5.6"
   }
 }
