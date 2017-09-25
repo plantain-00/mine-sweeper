@@ -13,8 +13,8 @@ module.exports = {
       ],
       css: [
         `lessc index.less > index.css`,
-        `postcss index.css -o index.postss.css`,
-        `cleancss -o index.bundle.css index.postss.css ./node_modules/github-fork-ribbon-css/gh-fork-ribbon.css`
+        `postcss index.css -o index.postcss.css`,
+        `cleancss -o index.bundle.css index.postcss.css ./node_modules/github-fork-ribbon-css/gh-fork-ribbon.css`
       ],
       clean: `rimraf *.bundle-*.js *.bundle-*.css`
     },
