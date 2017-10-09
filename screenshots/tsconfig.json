@@ -1,13 +1,7 @@
 {
     "compilerOptions": {
-        "target": "es5",
-
-        "lib": [
-            "dom",
-            "es2015"
-        ],
-
-        "module": "esnext",
+        "target": "esnext",
+        "module": "commonjs",
         "strict": true,
         "noUnusedLocals": true,
         "noImplicitReturns": true,
@@ -16,12 +10,6 @@
         "jsx": "react",
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node",
         "downlevelIteration": true
-    },
-    "files": [
-        "index.ts",
-        "variables.ts",
-        "vendor.ts"
-    ]
+    }
 }
