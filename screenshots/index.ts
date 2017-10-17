@@ -8,5 +8,20 @@ import * as puppeteer from "puppeteer";
     await page.waitFor(2000);
     await page.screenshot({ path: `screenshots/initial.png`, fullPage: true });
 
+    const items = await page.$$(".item");
+    if (items.length > 0) {
+        await items[0].click();
+        await page.waitFor(500);
+        await page.screenshot({ path: `screenshots/click-1.png`, fullPage: true });
+
+        await (page as any).select("select", "3");
+        await page.waitFor(1000);
+        await page.screenshot({ path: `screenshots/no-brain.png`, fullPage: true });
+
+        await page.click("button");
+        await page.waitFor(500);
+        await page.screenshot({ path: `screenshots/restart.png`, fullPage: true });
+    }
+
     browser.close();
 })();
