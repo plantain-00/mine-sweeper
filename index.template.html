@@ -15,8 +15,8 @@
         <button @click="start()">restart</button>
     </div>
     <div class="main" :style="mainStyle">
-        <template v-for="(row, rowIndex) in cells">
-            <template v-for="(cell, columnIndex) in row">
+        <template v-for="(row, rowIndex) in cells" :key="rowIndex">
+            <template v-for="(cell, columnIndex) in row" :key="columnIndex">
                 <template v-if="cell.visible">
                     <div v-if="cell.value === null" class="item mine"></div>
                     <div v-else-if="cell.value === 0" class="item"></div>
