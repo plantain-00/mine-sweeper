@@ -7,7 +7,7 @@ const lessFiles = `"*.less"`
 
 const templateCommand = `file2variable-cli index.template.html -o variables.ts --html-minify`
 const tscCommand = `tsc`
-const webpackCommand = `webpack --display-modules`
+const webpackCommand = `webpack`
 const revStaticCommand = `rev-static`
 const cssCommand = [
   `lessc index.less > index.css`,
