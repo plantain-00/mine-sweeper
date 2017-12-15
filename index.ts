@@ -105,7 +105,7 @@ export class App extends Vue {
         return false;
     }
 
-    flag(rowIndex: number, columnIndex: number, flagged: boolean) {
+    private flag(rowIndex: number, columnIndex: number, flagged: boolean) {
         const cell = this.cells[rowIndex][columnIndex];
         if (!cell.visible) {
             if (flagged) {
