@@ -17,9 +17,9 @@ const enum Difficulty {
 }
 
 @Component({
-    template: indexTemplateHtml,
+    render: indexTemplateHtml,
 })
-class App extends Vue {
+export class App extends Vue {
     rowCount = 16;
     columnCount = 30;
     mineCount = 99;
