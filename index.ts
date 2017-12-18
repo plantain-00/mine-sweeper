@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Component from "vue-class-component";
-import { indexTemplateHtml } from "./variables";
+import { indexTemplateHtml, indexTemplateHtmlStatic } from "./variables";
 
 type Cell = {
     value: number | null; // how many mines around, is mine if is null
@@ -18,6 +18,7 @@ const enum Difficulty {
 
 @Component({
     render: indexTemplateHtml,
+    staticRenderFns: indexTemplateHtmlStatic,
 })
 export class App extends Vue {
     rowCount = 16;
