@@ -1,2 +1,2 @@
-import "vue";
-import "vue-class-component";
+import 'vue'
+import 'vue-class-component'
