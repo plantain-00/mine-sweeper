@@ -311,7 +311,6 @@ new App({ el: '#container' })
 
 if (navigator.serviceWorker) {
   navigator.serviceWorker.register('service-worker.bundle.js').catch(error => {
-        // tslint:disable-next-line:no-console
     console.log('registration failed with error: ' + error)
   })
 }
