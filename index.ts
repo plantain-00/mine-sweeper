@@ -309,7 +309,7 @@ type Condition = {
 // tslint:disable-next-line:no-unused-expression
 new App({ el: '#container' })
 
-if (navigator.serviceWorker) {
+if (navigator.serviceWorker && !location.host.startsWith('localhost')) {
   navigator.serviceWorker.register('service-worker.bundle.js').catch(error => {
     console.log('registration failed with error: ' + error)
   })
