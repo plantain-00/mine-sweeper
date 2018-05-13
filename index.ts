@@ -10,10 +10,10 @@ type Cell = {
 }
 
 const enum Difficulty {
-    normal = 0,
-    easy = 1,
-    easier = 2,
-    noBrain = 3
+  normal = 0,
+  easy = 1,
+  easier = 2,
+  noBrain = 3
 }
 
 @Component({
@@ -31,22 +31,22 @@ export class App extends Vue {
   difficulty = Difficulty.normal
   private failed = false
 
-  get mainStyle () {
+  get mainStyle() {
     return {
       height: this.rowCount * 30 + 'px',
       width: this.columnCount * 30 + 'px'
     }
   }
 
-  private get cellsCount () {
+  private get cellsCount() {
     return this.rowCount * this.columnCount
   }
 
-  get averagePossibility () {
+  get averagePossibility() {
     return Math.round(this.remainMineCount * 100.0 / this.remainUnknownCount)
   }
 
-  beforeMount () {
+  beforeMount() {
     this.start()
 
     setInterval(() => {
@@ -64,7 +64,7 @@ export class App extends Vue {
     }, 1000)
   }
 
-  start () {
+  start() {
     const cells: Cell[][] = []
     for (let i = 0; i < this.rowCount; i++) {
       cells.push([])
@@ -96,17 +96,17 @@ export class App extends Vue {
     this.failed = false
   }
 
-  click (rowIndex: number, columnIndex: number) {
+  click(rowIndex: number, columnIndex: number) {
     this.probe(rowIndex, columnIndex)
   }
 
-  contextmenu (e: Event, rowIndex: number, columnIndex: number, flagged: boolean) {
+  contextmenu(e: Event, rowIndex: number, columnIndex: number, flagged: boolean) {
     this.flag(rowIndex, columnIndex, flagged)
     e.preventDefault()
     return false
   }
 
-  private flag (rowIndex: number, columnIndex: number, flagged: boolean) {
+  private flag(rowIndex: number, columnIndex: number, flagged: boolean) {
     const cell = this.cells[rowIndex][columnIndex]
     if (!cell.visible) {
       if (flagged) {
@@ -125,7 +125,7 @@ export class App extends Vue {
     }
   }
 
-  private probe (rowIndex: number, columnIndex: number) {
+  private probe(rowIndex: number, columnIndex: number) {
     const cell = this.cells[rowIndex][columnIndex]
     if (!cell.visible && !cell.flagged) {
       if (cell.value === null) {
@@ -140,7 +140,7 @@ export class App extends Vue {
     }
   }
 
-  private fail () {
+  private fail() {
     this.failed = true
     for (const row of this.cells) {
       for (const cell of row) {
@@ -151,7 +151,7 @@ export class App extends Vue {
     }
   }
 
-  private getAroundCount (rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => number): number {
+  private getAroundCount(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => number): number {
     let count = 0
     const results = this.around(rowIndex, columnIndex, action)
     for (const result of results) {
@@ -160,14 +160,14 @@ export class App extends Vue {
     return count
   }
 
-  private aroundAction (rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => void): void {
+  private aroundAction(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => void): void {
     const results = this.around(rowIndex, columnIndex, action)
     while (!results.next().done) {
-            // do nothing
+      // do nothing
     }
   }
 
-  private getAroundPositions (rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => Position | null): Position[] {
+  private getAroundPositions(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => Position | null): Position[] {
     const positions: Position[] = []
     const results = this.around(rowIndex, columnIndex, action)
     for (const result of results) {
@@ -178,14 +178,14 @@ export class App extends Vue {
     return positions
   }
 
-  private *aroundIndex<T> (rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
+  private *aroundIndex<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
     if (rowIndex >= 0 && rowIndex < this.rowCount
-            && columnIndex >= 0 && columnIndex < this.columnCount) {
+      && columnIndex >= 0 && columnIndex < this.columnCount) {
       yield action(rowIndex, columnIndex)
     }
   }
 
-  private *around<T> (rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
+  private *around<T>(rowIndex: number, columnIndex: number, action: (newRowIndex: number, newColumnIndex: number) => T) {
     yield* this.aroundIndex(rowIndex - 1, columnIndex - 1, action)
     yield* this.aroundIndex(rowIndex - 1, columnIndex, action)
     yield* this.aroundIndex(rowIndex - 1, columnIndex + 1, action)
@@ -196,13 +196,14 @@ export class App extends Vue {
     yield* this.aroundIndex(rowIndex + 1, columnIndex + 1, action)
   }
 
-  private checkForNormal (cell: Cell, rowIndex: number, columnIndex: number) {
+  private checkForNormal(cell: Cell, rowIndex: number, columnIndex: number) {
     if (cell.value === 0) {
       this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.probe(newRowIndex, newColumnIndex))
     }
   }
 
-  private checkForEasy () {
+  // tslint:disable-next-line:cognitive-complexity
+  private checkForEasy() {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
         const cell = this.cells[rowIndex][columnIndex]
@@ -222,7 +223,8 @@ export class App extends Vue {
     }
   }
 
-  private checkForEasier () {
+  // tslint:disable-next-line:cognitive-complexity
+  private checkForEasier() {
     const conditions: Condition[] = []
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
@@ -246,7 +248,7 @@ export class App extends Vue {
     for (const condition1 of conditions) {
       for (const condition2 of conditions) {
         if (condition1.positions.length > condition2.positions.length
-                    && condition2.positions.every(p2 => condition1.positions.some(p1 => p1.rowIndex === p2.rowIndex && p1.columnIndex === p2.columnIndex))) {
+          && condition2.positions.every(p2 => condition1.positions.some(p1 => p1.rowIndex === p2.rowIndex && p1.columnIndex === p2.columnIndex))) {
           const mineCount = condition1.mineCount - condition2.mineCount
           const unknownCount = condition1.positions.length - condition2.positions.length
           if (mineCount === unknownCount) {
@@ -265,7 +267,8 @@ export class App extends Vue {
     }
   }
 
-  private checkForNoBrain () {
+  // tslint:disable-next-line:cognitive-complexity
+  private checkForNoBrain() {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
         const cell = this.cells[rowIndex][columnIndex]
