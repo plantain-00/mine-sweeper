@@ -207,16 +207,14 @@ export class App extends Vue {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
         const cell = this.cells[rowIndex][columnIndex]
-        if (cell.visible) { // only check its value if it is visible, or it is cheat
-          if (cell.value !== null && cell.value !== 0) {
-            const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
-            const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
-            const mineCount = cell.value - flaggedCount
-            if (mineCount === unknownCount) {
-              this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.flag(newRowIndex, newColumnIndex, true))
-            } else if (mineCount === 0) {
-              this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.probe(newRowIndex, newColumnIndex))
-            }
+        if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+          const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
+          const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
+          const mineCount = cell.value - flaggedCount
+          if (mineCount === unknownCount) {
+            this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.flag(newRowIndex, newColumnIndex, true))
+          } else if (mineCount === 0) {
+            this.aroundAction(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => this.probe(newRowIndex, newColumnIndex))
           }
         }
       }
@@ -229,17 +227,15 @@ export class App extends Vue {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
         const cell = this.cells[rowIndex][columnIndex]
-        if (cell.visible) { // only check its value if it is visible, or it is cheat
-          if (cell.value !== null && cell.value !== 0) {
-            const flaggedPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
-            const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
-            const mineCount = cell.value - flaggedPositions.length
-            if (mineCount > 0 && unknownPositions.length > 0) {
-              conditions.push({
-                positions: unknownPositions,
-                mineCount
-              })
-            }
+        if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+          const flaggedPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
+          const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
+          const mineCount = cell.value - flaggedPositions.length
+          if (mineCount > 0 && unknownPositions.length > 0) {
+            conditions.push({
+              positions: unknownPositions,
+              mineCount
+            })
           }
         }
       }
@@ -281,17 +277,15 @@ export class App extends Vue {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
         const cell = this.cells[rowIndex][columnIndex]
-        if (cell.visible) { // only check its value if it is visible, or it is cheat
-          if (cell.value !== null && cell.value !== 0) {
-            const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
-            const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
-            const mineCount = cell.value - flaggedCount
+        if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+          const flaggedCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
+          const unknownCount = this.getAroundCount(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? 1 : 0)
+          const mineCount = cell.value - flaggedCount
 
-            const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
-            for (const position of unknownPositions) {
-              const unknownCell = this.cells[position.rowIndex][position.columnIndex]
-              unknownCell.possibility = Math.max(unknownCell.possibility, Math.round(mineCount * 100.0 / unknownCount))
-            }
+          const unknownPositions = this.getAroundPositions(rowIndex, columnIndex, (newRowIndex, newColumnIndex) => (!this.cells[newRowIndex][newColumnIndex].visible && !this.cells[newRowIndex][newColumnIndex].flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null)
+          for (const position of unknownPositions) {
+            const unknownCell = this.cells[position.rowIndex][position.columnIndex]
+            unknownCell.possibility = Math.max(unknownCell.possibility, Math.round(mineCount * 100.0 / unknownCount))
           }
         }
       }
