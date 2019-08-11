@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { indexTemplateHtml, indexTemplateHtmlStatic } from './variables'
 
-type Cell = {
+interface Cell {
   value: number | null; // how many mines around, is mine if is null
   visible: boolean;
   flagged: boolean;
@@ -202,7 +202,6 @@ export class App extends Vue {
     }
   }
 
-  // tslint:disable-next-line:cognitive-complexity
   private checkForEasy() {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
@@ -221,7 +220,6 @@ export class App extends Vue {
     }
   }
 
-  // tslint:disable-next-line:cognitive-complexity
   private checkForEasier() {
     const conditions: Condition[] = []
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
@@ -263,7 +261,6 @@ export class App extends Vue {
     }
   }
 
-  // tslint:disable-next-line:cognitive-complexity
   private checkForNoBrain() {
     for (let rowIndex = 0; rowIndex < this.rowCount; rowIndex++) {
       for (let columnIndex = 0; columnIndex < this.columnCount; columnIndex++) {
@@ -293,17 +290,16 @@ export class App extends Vue {
   }
 }
 
-type Position = {
+interface Position {
   rowIndex: number;
   columnIndex: number;
 }
 
-type Condition = {
+interface Condition {
   positions: Position[];
   mineCount: number;
 }
 
-// tslint:disable-next-line:no-unused-expression
 new App({ el: '#container' })
 
 if (navigator.serviceWorker && !location.host.startsWith('localhost')) {
