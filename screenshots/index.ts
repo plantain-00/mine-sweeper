@@ -23,5 +23,5 @@ import puppeteer from 'puppeteer'
     await page.screenshot({ path: `screenshots/restart.png` })
   }
 
-  browser.close()
+  await browser.close()
 })()
