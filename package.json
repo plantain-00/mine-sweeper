@@ -20,7 +20,7 @@
     "url": "https://github.com/plantain-00/mine-sweeper/issues"
   },
   "typeCoverage": {
-    "atLeast": 90
+    "atLeast": 91.69
   },
   "homepage": "https://github.com/plantain-00/mine-sweeper#readme",
   "devDependencies": {

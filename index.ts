@@ -303,7 +303,7 @@ interface Condition {
 new App({ el: '#container' })
 
 if (navigator.serviceWorker && !location.host.startsWith('localhost')) {
-  navigator.serviceWorker.register('service-worker.bundle.js').catch(error => {
+  navigator.serviceWorker.register('service-worker.bundle.js').catch((error: Error) => {
     console.log('registration failed with error: ' + error)
   })
 }
