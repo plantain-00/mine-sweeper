@@ -73,7 +73,7 @@ export function indexTemplateHtml(_ctx, _cache) {
                             key: 2,
                             class: "item"
                           }, _toDisplayString(cell.value), 1 /* TEXT */))
-                  ], 64 /* STABLE_FRAGMENT */))
+                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
                 : (_openBlock(), _createBlock(_Fragment, { key: 1 }, [
                     (cell.flagged)
                       ? (_openBlock(), _createBlock("div", {
@@ -87,7 +87,7 @@ export function indexTemplateHtml(_ctx, _cache) {
                           onClick: $event => (_ctx.click(rowIndex, columnIndex)),
                           onContextmenu: $event => (_ctx.contextmenu($event, rowIndex, columnIndex, true))
                         }, _toDisplayString((_ctx.difficulty >= 3 && cell.possibility >= 0) ? cell.possibility : ""), 41 /* TEXT, PROPS, HYDRATE_EVENTS */, ["onClick", "onContextmenu"]))
-                  ], 64 /* STABLE_FRAGMENT */))
+                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
             ], 64 /* STABLE_FRAGMENT */))
           }), 256 /* UNKEYED_FRAGMENT */))
         ], 64 /* STABLE_FRAGMENT */))
