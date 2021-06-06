@@ -86,24 +86,28 @@
   border-bottom: @border;
   box-sizing: content-box;
 
-  .item {
-    height: @height;
-    width: @height;
-    line-height: @height;
-    text-align: center;
-    border-left: @border;
-    border-top: @border;
-    box-sizing: border-box;
-  }
+  .row {
+    display: flex;
 
-  .unknown {
-    cursor: pointer;
-    background-color: gray;
-    color: white;
-  }
+    .item {
+      height: @height;
+      width: @height;
+      line-height: @height;
+      text-align: center;
+      border-left: @border;
+      border-top: @border;
+      box-sizing: border-box;
+    }
 
-  .mine {
-    background-color: black;
-    border-radius: @height / 2;
+    .unknown {
+      cursor: pointer;
+      background-color: gray;
+      color: white;
+    }
+
+    .mine {
+      background-color: black;
+      border-radius: calc(@height / 2);
+    }
   }
 }
