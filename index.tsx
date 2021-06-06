@@ -128,6 +128,9 @@ function App() {
                   className="item unknown"
                   onClick={() => {
                     setMineSweeper(produce(mineSweeper, (draft) => {
+                      if (mineSweeper.remainUnknownCount === mineSweeper.cellsCount) {
+                        start(draft, { rowIndex, columnIndex })
+                      }
                       probe(draft, rowIndex, columnIndex)
                     }))
                   }}
@@ -136,7 +139,7 @@ function App() {
                     color: difficulty >= 3 && cell.possibility > mineSweeper.averagePossibility ? 'red' : undefined,
                   }}
                 >
-                  {(difficulty >= 3 && cell.possibility >= 0) ? cell.possibility : ""}
+                  {(difficulty >= Difficulty.noBrain && cell.possibility >= 0) ? cell.possibility : ""}
                 </div>
               )
             })}
