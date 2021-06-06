@@ -104,16 +104,16 @@ function App() {
         {mineSweeper.cells.map((row, rowIndex) => (
           <div className="row" key={rowIndex}>
             {row.map((cell, columnIndex) => {
-              if (cell.visible) {
-                if (cell.value === null) {
-                  return <div key={columnIndex} className="item mine"></div>
-                }
-                if (cell.value === 0) {
-                  return <div key={columnIndex} className="item"></div>
-                }
-                return <div key={columnIndex} className="item">{cell.value}</div>
+              if (cell.status === null) {
+                return <div key={columnIndex} className="item mine"></div>
               }
-              if (cell.flagged) {
+              if (cell.status === 0) {
+                return <div key={columnIndex} className="item"></div>
+              }
+              if (typeof cell.status === 'number') {
+                return <div key={columnIndex} className="item">{cell.status}</div>
+              }
+              if (cell.status === true) {
                 return (
                   <div
                     key={columnIndex}

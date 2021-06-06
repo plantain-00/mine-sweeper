@@ -47,16 +47,11 @@ export class MineSweeper {
  * @public
  */
 export function start(draft: WritableDraft<MineSweeper>): void {
-  const cells: Cell[][] = []
+  const mineCells: (number | null)[][] = []
   for (let i = 0; i < draft.rowCount; i++) {
-    cells.push([])
+    mineCells.push([])
     for (let j = 0; j < draft.columnCount; j++) {
-      cells[i].push({
-        value: 0,
-        visible: false,
-        flagged: false,
-        possibility: -1
-      })
+      mineCells[i].push(0)
     }
   }
 
@@ -65,10 +60,33 @@ export function start(draft: WritableDraft<MineSweeper>): void {
     const index = Math.floor(Math.random() * draft.cellsCount)
     const columnIndex = Math.floor(index / draft.columnCount)
     const rowIndex = index - columnIndex * draft.columnCount
-    const cell = cells[columnIndex][rowIndex]
-    if (cell.value !== null) {
-      cell.value = null
+    const cell = mineCells[columnIndex][rowIndex]
+    if (cell !== null) {
+      mineCells[columnIndex][rowIndex] = null
       count--
+    }
+  }
+
+  for (let i = 0; i < draft.rowCount; i++) {
+    for (let j = 0; j < draft.columnCount; j++) {
+      const cell = mineCells[i][j]
+      if (cell !== null) {
+        mineCells[i][j] = getAroundCount(
+          i,
+          j,
+          draft.rowCount,
+          draft.columnCount,
+          (newRowIndex, newColumnIndex) => mineCells[newRowIndex][newColumnIndex] === null ? 1 : 0,
+        )
+      }
+    }
+  }
+
+  const cells: Cell[][] = []
+  for (let i = 0; i < draft.rowCount; i++) {
+    cells.push([])
+    for (let j = 0; j < draft.columnCount; j++) {
+      cells[i].push(new Cell(mineCells[i][j]))
     }
   }
 
@@ -101,7 +119,7 @@ export function checkForEasy(draft: WritableDraft<MineSweeper>): void {
   for (let rowIndex = 0; rowIndex < draft.rowCount; rowIndex++) {
     for (let columnIndex = 0; columnIndex < draft.columnCount; columnIndex++) {
       const cell = draft.cells[rowIndex][columnIndex]
-      if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+      if (typeof cell.status === 'number' && cell.status !== 0) {
         const flaggedCount = getAroundCount(
           rowIndex,
           columnIndex,
@@ -122,7 +140,7 @@ export function checkForEasy(draft: WritableDraft<MineSweeper>): void {
             return (!newCell.visible && !newCell.flagged) ? 1 : 0
           },
         )
-        const mineCount = cell.value - flaggedCount
+        const mineCount = cell.status - flaggedCount
         if (mineCount === unknownCount) {
           aroundAction(
             rowIndex,
@@ -153,7 +171,7 @@ export function checkForEasier(draft: WritableDraft<MineSweeper>): void {
   for (let rowIndex = 0; rowIndex < draft.rowCount; rowIndex++) {
     for (let columnIndex = 0; columnIndex < draft.columnCount; columnIndex++) {
       const cell = draft.cells[rowIndex][columnIndex]
-      if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+      if (typeof cell.status === 'number' && cell.status !== 0) {
         const flaggedPositions = getAroundPositions(
           rowIndex,
           columnIndex,
@@ -174,7 +192,7 @@ export function checkForEasier(draft: WritableDraft<MineSweeper>): void {
             return (!newCell.visible && !newCell.flagged) ? { rowIndex: newRowIndex, columnIndex: newColumnIndex } : null
           },
         )
-        const mineCount = cell.value - flaggedPositions.length
+        const mineCount = cell.status - flaggedPositions.length
         if (mineCount > 0 && unknownPositions.length > 0) {
           conditions.push({
             positions: unknownPositions,
@@ -223,7 +241,7 @@ export function checkForNoBrain(draft: WritableDraft<MineSweeper>): void {
   for (let rowIndex = 0; rowIndex < draft.rowCount; rowIndex++) {
     for (let columnIndex = 0; columnIndex < draft.columnCount; columnIndex++) {
       const cell = draft.cells[rowIndex][columnIndex]
-      if (cell.visible && cell.value !== null && cell.value !== 0) { // only check its value if it is visible, or it is cheat
+      if (typeof cell.status === 'number' && cell.status !== 0) {
         const flaggedCount = getAroundCount(
           rowIndex,
           columnIndex,
@@ -244,7 +262,7 @@ export function checkForNoBrain(draft: WritableDraft<MineSweeper>): void {
             return (!newCell.visible && !newCell.flagged) ? 1 : 0
           },
         )
-        const mineCount = cell.value - flaggedCount
+        const mineCount = cell.status - flaggedCount
 
         const unknownPositions = getAroundPositions(
           rowIndex,
@@ -269,9 +287,7 @@ function fail(draft: WritableDraft<MineSweeper>) {
   draft.failed = true
   for (const row of draft.cells) {
     for (const cell of row) {
-      if (cell.value === null) {
-        cell.visible = true
-      }
+      cell.showAllMinesWhenGameFailed()
     }
   }
 }
@@ -281,30 +297,7 @@ function fail(draft: WritableDraft<MineSweeper>) {
  */
 export function probe(draft: WritableDraft<MineSweeper>, rowIndex: number, columnIndex: number): void {
   const cell = draft.cells[rowIndex][columnIndex]
-  if (!cell.visible && !cell.flagged) {
-    if (cell.value === null) {
-      fail(draft)
-    } else {
-      cell.value = getAroundCount(
-        rowIndex,
-        columnIndex,
-        draft.rowCount,
-        draft.columnCount,
-        (newRowIndex, newColumnIndex) => draft.cells[newRowIndex][newColumnIndex].value === null ? 1 : 0,
-      )
-      cell.visible = true
-
-      if (cell.value === 0) {
-        aroundAction(
-          rowIndex,
-          columnIndex,
-          draft.rowCount,
-          draft.columnCount,
-          (newRowIndex, newColumnIndex) => probe(draft, newRowIndex, newColumnIndex),
-        )
-      }
-    }
-  }
+  cell.probe(draft, rowIndex, columnIndex)
 }
 
 function getAroundPositions(
@@ -382,11 +375,54 @@ function aroundAction(
   }
 }
 
-interface Cell {
-  value: number | null; // how many mines around, is mine if is null
-  visible: boolean;
-  flagged: boolean;
-  possibility: number;
+class Cell {
+  [immerable] = true
+
+  constructor(
+    private value: number | null = 0 // how many mines around, is mine if is null
+  ) { }
+
+  visible = false
+  flagged = false
+  possibility = -1
+
+  showAllMinesWhenGameFailed() {
+    if (this.value === null) {
+      this.visible = true
+    }
+  }
+  get status() {
+    if (this.visible) {
+      return this.value
+    }
+    if (this.flagged) {
+      return true
+    }
+    return 'unknown'
+  }
+  probe(
+    draft: WritableDraft<MineSweeper>,
+    rowIndex: number,
+    columnIndex: number,
+  ) {
+    if (this.visible || this.flagged) {
+      return
+    }
+    if (this.value === null) {
+      fail(draft)
+    } else {
+      this.visible = true
+      if (this.status === 0) {
+        aroundAction(
+          rowIndex,
+          columnIndex,
+          draft.rowCount,
+          draft.columnCount,
+          (newRowIndex, newColumnIndex) => probe(draft, newRowIndex, newColumnIndex),
+        )
+      }
+    }
+  }
 }
 
 interface Position {
