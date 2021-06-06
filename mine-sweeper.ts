@@ -46,7 +46,7 @@ export class MineSweeper {
 /**
  * @public
  */
-export function start(draft: WritableDraft<MineSweeper>): void {
+export function start(draft: WritableDraft<MineSweeper>, safePosition?: Position): void {
   const mineCells: (number | null)[][] = []
   for (let i = 0; i < draft.rowCount; i++) {
     mineCells.push([])
@@ -58,11 +58,14 @@ export function start(draft: WritableDraft<MineSweeper>): void {
   let count = draft.mineCount
   while (count > 0) {
     const index = Math.floor(Math.random() * draft.cellsCount)
-    const columnIndex = Math.floor(index / draft.columnCount)
-    const rowIndex = index - columnIndex * draft.columnCount
-    const cell = mineCells[columnIndex][rowIndex]
+    const rowIndex = Math.floor(index / draft.columnCount)
+    const columnIndex = index - rowIndex * draft.columnCount
+    if (safePosition && safePosition.rowIndex === rowIndex && safePosition.columnIndex === columnIndex) {
+      continue
+    }
+    const cell = mineCells[rowIndex][columnIndex]
     if (cell !== null) {
-      mineCells[columnIndex][rowIndex] = null
+      mineCells[rowIndex][columnIndex] = null
       count--
     }
   }
@@ -278,6 +281,28 @@ export function checkForNoBrain(draft: WritableDraft<MineSweeper>): void {
           const unknownCell = draft.cells[position.rowIndex][position.columnIndex]
           unknownCell.possibility = Math.max(unknownCell.possibility, Math.round(mineCount * 100.0 / unknownCount))
         }
+      }
+    }
+  }
+
+  let remainMineCount = draft.remainMineCount
+  let unknownCount = 0
+  for (const row of draft.cells) {
+    for (const cell of row) {
+      if (!cell.visible && !cell.flagged) {
+        if (cell.possibility === -1) {
+          unknownCount++
+        } else {
+          remainMineCount -= cell.possibility * 0.01
+        }
+      }
+    }
+  }
+  const possibility = Math.round(remainMineCount * 100.0 / unknownCount)
+  for (const row of draft.cells) {
+    for (const cell of row) {
+      if (!cell.visible && !cell.flagged && cell.possibility === -1) {
+        cell.possibility = possibility
       }
     }
   }
